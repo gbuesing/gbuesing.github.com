@@ -50,9 +50,10 @@
       ]
     };
   
-    var currentGeneration = [], nextGeneration = [];
+    var currentGeneration = patterns[pattern];
   
     function calculateNextGeneration() {
+      var nextGeneration = [];
       for (var y=0; y < currentGeneration.length; y++) {
         var line = currentGeneration[y];
         var nextCells = [];
@@ -62,6 +63,7 @@
         }
         nextGeneration[y] = nextCells.join('');
       }
+      return nextGeneration;
     }
   
     function isCellAlive(x,y) {
@@ -105,20 +107,11 @@
       } else {
        return arr[i];
       }
-    }
-  
-    function advanceGeneration() {
-      currentGeneration = nextGeneration;
-      nextGeneration = [];
-    }
-  
-    // setup initial state
-    currentGeneration = patterns[pattern];    
+    }    
     
     return {
       next: function() {
-        calculateNextGeneration();
-        advanceGeneration();
+        currentGeneration = calculateNextGeneration();
       },
       toString: function() {
         return currentGeneration.join("\n")
