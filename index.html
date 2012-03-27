@@ -110,8 +110,10 @@
     }    
     
     return {
+      generation: 0,
       next: function() {
         currentGeneration = calculateNextGeneration();
+        this.generation ++;
       },
       toString: function() {
         return currentGeneration.join("\n")
@@ -123,7 +125,7 @@
   
   var elem = document.getElementsByTagName("pre")[0];
   
-  setInterval(function() {
+  var loop = setInterval(function() {
     game.next();
     elem.textContent = game.toString();
   }, 100);
