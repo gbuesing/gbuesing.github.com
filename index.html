@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>gbuesing.github.com</title>
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+    <style>
+    pre {
+      float: left; 
+      border: 1px dotted #ccc;
+    }
+    </style>
+  </head>
+  <body>
+    <pre></pre>
+  </body>
+  <script>
+  
+  var currentGeneration = [
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                     *                                     ',
+    '                                                  ****    *                                ',
+    '                                         *       ****     *                                ',
+    '                                        * *      *  *         **                           ',
+    '                                       *   **    ****         **                           ',
+    '                            **         *   **     ****                                     ',
+    '                            **         *   **        *                                     ',
+    '                                        * *                                                ',
+    '                                         *                                                 ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           ',
+    '                                                                                           '
+  ];
+  
+  var nextGeneration = [];
+  
+  var pre = document.getElementsByTagName("pre")[0];
+  pre.textContent = currentGeneration.join("\n");
+  
+  function calculateNextGeneration() {
+    for (var y=0; y < currentGeneration.length; y++) {
+      var line = currentGeneration[y];
+      nextGeneration[y] = '';
+      for (var x=0; x < line.length; x++) {
+        var nextCell = isCellAliveInNextGeneration(x,y) ? '*' : ' ';
+        nextGeneration[y] += nextCell;
+      }
+    }
+  }
+  
+  function isCellAliveInNextGeneration(x,y) {
+    var cell = currentGeneration[y][x];
+    var currentlyAlive = (cell === '*');
+    var aliveNeighbors = countAliveNeighbors(x,y);
+    if (currentlyAlive) {
+      return aliveNeighbors === 2 || aliveNeighbors === 3;
+    } else {
+      return aliveNeighbors === 3;
+    }
+  }
+  
+  function countAliveNeighbors(x,y) {
+    var sum = 0;
+    var neighbors = [[-1, 0],[1, 0],[-1, 1],[0, 1],[1, 1],[-1, -1],[0, -1], [1, -1]];
+    neighbors.forEach(function(pair) {
+      var neighbor_x = pair[0], neighbor_y = pair[1];
+      var line = atIndex(currentGeneration, y+neighbor_y);
+      var cell = atIndex(line, x + neighbor_x);
+      if (cell === '*') { sum ++ };
+    });
+    return sum;
+  }
+    
+  function drawNextGeneration() {
+    pre.textContent = nextGeneration.join("\n");
+    currentGeneration = nextGeneration;
+    nextGeneration = [];
+  }
+  
+  // enables wraparound lookups on arrays and strings
+  function atIndex(arr, i) { 
+    var length = arr.length;
+    if (i >= length) {
+      return arr[i - length];
+    } else if (i < 0) {
+      return arr[length + i];
+    } else {
+     return arr[i];
+    }
+  }
+  
+  setInterval(function() {
+    calculateNextGeneration();
+    drawNextGeneration();
+  }, 100);
+  </script>
+</html>
