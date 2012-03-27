@@ -14,43 +14,69 @@
     <pre></pre>
   </body>
   <script>
+
+  // http://www.radicaleye.com/lifepage/glossary.html
+  // TODO: add more!
+  var patterns = {
+    'acorn': [
+      '.*.....',
+      '...*...',
+      '**..***'
+    ],
+    'ants': [
+      '**........**...**...**...**...**...**..',
+      '..**.**.....**...**...**...**...**...**',
+      '..**...**...**...**...**...**...**...**',
+      '**.....**.**...**...**...**...**...**..',
+      '.....**................................'
+    ],
+    'blinker': [
+      '...',
+      '***',
+      '...'
+    ],
+    'gun': [
+      '.........................*..........',
+      '......................****....*.....',
+      '.............*.......****.....*.....',
+      '............*.*......*..*.........**',
+      '...........*...**....****.........**',
+      '**.........*...**.....****..........',
+      '**.........*...**........*..........',
+      '............*.*.....................',
+      '.............*......................'
+    ],
+    'rabbits': [
+      '*...***',
+      '***..*.',
+      '.*.....'
+    ]
+  };
   
-  function gameOfLife(pattern) {
+  function gameOfLife(width, height) {
   
-    // TODO: add patterns. No need to include entire universe in pattern.
-    var patterns = {
-      'gun': [
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                     *                                     ',
-        '                                                  ****    *                                ',
-        '                                         *       ****     *                                ',
-        '                                        * *      *  *         **                           ',
-        '                                       *   **    ****         **                           ',
-        '                            **         *   **     ****                                     ',
-        '                            **         *   **        *                                     ',
-        '                                        * *                                                ',
-        '                                         *                                                 ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           ',
-        '                                                                                           '
-      ]
-    };
-  
-    var currentGeneration = patterns[pattern];
+    var currentGeneration = [];
+    
+    function setBlankGeneration() { // wee-ooo
+      var line = (new Array(width + 1)).join(' ');
+      for (var i=0; i < height; i++) currentGeneration[i] = line;
+    }
+    
+    var aliveCellRegexp = /\*/g;
+    
+    function addPattern(pattern, offset_x, offset_y) {      
+      if (!offset_x) offset_x = parseInt((width - pattern[0].length) / 2);
+      if (!offset_y) offset_y = parseInt((height - pattern.length) / 2);
+      
+      for (var y=0; y < pattern.length; y++) {
+        var match, line = pattern[y];
+        aliveCellRegexp.lastIndex = 0;
+        
+        while (match = aliveCellRegexp.exec(line)) {
+          draw(match.index + offset_x, y + offset_y);
+        }
+      };
+    }
   
     function calculateNextGeneration() {
       var nextGeneration = [];
@@ -98,16 +124,30 @@
   
     // enables wraparound lookups on arrays and strings
     // fyi will not work with unicode strings!
-    function atIndex(arr, i) { 
-      var length = arr.length;
-      if (i >= length) {
-        return arr[i - length];
-      } else if (i < 0) {
-        return arr[length + i];
-      } else {
-       return arr[i];
+    function atIndex(arr, i) {
+      return arr[wraparoundIndex(i, arr.length)];
+    }
+    
+    function wraparoundIndex(i, length) {
+      if (i >= length) return i - length;
+      else if (i < 0) return length + i;
+      else return i;
+    }
+    
+    function replaceCharAtIndex(str, i, replacement) {
+      var length = str.length;
+      if (i >= length) return str;
+      return [str.slice(0,i), replacement, str.slice(i+1,str.length)].join('');
+    }
+    
+    function draw(x,y) {
+      var line = currentGeneration[y];
+      if (line) {
+        currentGeneration[y] = replaceCharAtIndex(line, x, '*');
       }
-    }    
+    }
+    
+    setBlankGeneration();
     
     return {
       generation: 0,
@@ -117,13 +157,15 @@
       },
       toString: function() {
         return currentGeneration.join("\n")
-      }
+      },
+      addPattern: addPattern
     }
   }
-
-  var game = gameOfLife('gun');
   
   var elem = document.getElementsByTagName("pre")[0];
+  
+  var game = gameOfLife(90, 30);
+  game.addPattern(patterns['gun']);
   
   var loop = setInterval(function() {
     game.next();
