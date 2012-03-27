@@ -15,96 +15,120 @@
   </body>
   <script>
   
-  var currentGeneration = [
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                     *                                     ',
-    '                                                  ****    *                                ',
-    '                                         *       ****     *                                ',
-    '                                        * *      *  *         **                           ',
-    '                                       *   **    ****         **                           ',
-    '                            **         *   **     ****                                     ',
-    '                            **         *   **        *                                     ',
-    '                                        * *                                                ',
-    '                                         *                                                 ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           ',
-    '                                                                                           '
-  ];
+  function gameOfLife(elem, pattern) {
   
-  var nextGeneration = [];
+    // TODO: add patterns. No need to include entire universe in pattern.
+    var patterns = {
+      'gun': [
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                     *                                     ',
+        '                                                  ****    *                                ',
+        '                                         *       ****     *                                ',
+        '                                        * *      *  *         **                           ',
+        '                                       *   **    ****         **                           ',
+        '                            **         *   **     ****                                     ',
+        '                            **         *   **        *                                     ',
+        '                                        * *                                                ',
+        '                                         *                                                 ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           ',
+        '                                                                                           '
+      ]
+    };
   
-  var pre = document.getElementsByTagName("pre")[0];
-  pre.textContent = currentGeneration.join("\n");
+    var currentGeneration = [], nextGeneration = [];
   
-  function calculateNextGeneration() {
-    for (var y=0; y < currentGeneration.length; y++) {
-      var line = currentGeneration[y];
-      nextGeneration[y] = '';
-      for (var x=0; x < line.length; x++) {
-        var nextCell = isCellAliveInNextGeneration(x,y) ? '*' : ' ';
-        nextGeneration[y] += nextCell;
+    function calculateNextGeneration() {
+      for (var y=0; y < currentGeneration.length; y++) {
+        var line = currentGeneration[y];
+        var nextCells = [];
+        for (var x=0; x < line.length; x++) {
+          var nextCell = isCellAliveInNextGeneration(x,y) ? '*' : ' ';
+          nextCells.push(nextCell);
+        }
+        nextGeneration[y] = nextCells.join('');
       }
     }
-  }
   
-  function isCellAliveInNextGeneration(x,y) {
-    var cell = currentGeneration[y][x];
-    var currentlyAlive = (cell === '*');
-    var aliveNeighbors = countAliveNeighbors(x,y);
-    if (currentlyAlive) {
-      return aliveNeighbors === 2 || aliveNeighbors === 3;
-    } else {
-      return aliveNeighbors === 3;
+    function isCellAlive(x,y) {
+      return getCell(x,y) === '*';
     }
-  }
   
-  function countAliveNeighbors(x,y) {
-    var sum = 0;
-    var neighbors = [[-1, 0],[1, 0],[-1, 1],[0, 1],[1, 1],[-1, -1],[0, -1], [1, -1]];
-    neighbors.forEach(function(pair) {
-      var neighbor_x = pair[0], neighbor_y = pair[1];
-      var line = atIndex(currentGeneration, y+neighbor_y);
-      var cell = atIndex(line, x + neighbor_x);
-      if (cell === '*') { sum ++ };
-    });
-    return sum;
-  }
+    function isCellAliveInNextGeneration(x,y) {
+      var aliveNeighbors = countAliveNeighbors(x,y);
     
-  function drawNextGeneration() {
-    pre.textContent = nextGeneration.join("\n");
-    currentGeneration = nextGeneration;
-    nextGeneration = [];
-  }
-  
-  // enables wraparound lookups on arrays and strings
-  function atIndex(arr, i) { 
-    var length = arr.length;
-    if (i >= length) {
-      return arr[i - length];
-    } else if (i < 0) {
-      return arr[length + i];
-    } else {
-     return arr[i];
+      if (isCellAlive(x,y)) {
+        return aliveNeighbors === 2 || aliveNeighbors === 3;
+      } else {
+        return aliveNeighbors === 3;
+      }
     }
+  
+    var neighborOffsets = [[-1, 0],[1, 0],[-1, 1],[0, 1],[1, 1],[-1, -1],[0, -1], [1, -1]];
+  
+    function countAliveNeighbors(x,y) {
+      var sum = 0;
+      neighborOffsets.forEach(function(pair) {
+        var offset_x = pair[0], offset_y = pair[1];
+        if (isCellAlive(x + offset_x, y + offset_y)) sum ++;
+      });
+      return sum;
+    }
+  
+    function getCell(x,y) {
+      var line = atIndex(currentGeneration, y);
+      return atIndex(line, x);
+    }
+  
+    // enables wraparound lookups on arrays and strings
+    // fyi will not work with unicode strings!
+    function atIndex(arr, i) { 
+      var length = arr.length;
+      if (i >= length) {
+        return arr[i - length];
+      } else if (i < 0) {
+        return arr[length + i];
+      } else {
+       return arr[i];
+      }
+    }
+  
+    function advanceGeneration() {
+      currentGeneration = nextGeneration;
+      nextGeneration = [];
+    }
+    
+    function draw() {
+      elem.textContent = currentGeneration.join("\n");
+    }
+  
+    // setup initial state
+    currentGeneration = patterns[pattern];
+    draw();
+
+    // main loop
+    setInterval(function() {
+      calculateNextGeneration();
+      advanceGeneration();
+      draw();
+    }, 100);
   }
   
-  setInterval(function() {
-    calculateNextGeneration();
-    drawNextGeneration();
-  }, 100);
+  // run it
+  gameOfLife(document.getElementsByTagName("pre")[0], 'gun');
   </script>
 </html>
