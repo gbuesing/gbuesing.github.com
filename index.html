@@ -15,7 +15,7 @@
   </body>
   <script>
   
-  function gameOfLife(elem, pattern) {
+  function gameOfLife(pattern) {
   
     // TODO: add patterns. No need to include entire universe in pattern.
     var patterns = {
@@ -111,24 +111,28 @@
       currentGeneration = nextGeneration;
       nextGeneration = [];
     }
-    
-    function draw() {
-      elem.textContent = currentGeneration.join("\n");
-    }
   
     // setup initial state
-    currentGeneration = patterns[pattern];
-    draw();
-
-    // main loop
-    setInterval(function() {
-      calculateNextGeneration();
-      advanceGeneration();
-      draw();
-    }, 100);
+    currentGeneration = patterns[pattern];    
+    
+    return {
+      next: function() {
+        calculateNextGeneration();
+        advanceGeneration();
+      },
+      toString: function() {
+        return currentGeneration.join("\n")
+      }
+    }
   }
+
+  var game = gameOfLife('gun');
   
-  // run it
-  gameOfLife(document.getElementsByTagName("pre")[0], 'gun');
+  var elem = document.getElementsByTagName("pre")[0];
+  
+  setInterval(function() {
+    game.next();
+    elem.textContent = game.toString();
+  }, 100);
   </script>
 </html>
