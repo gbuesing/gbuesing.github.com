@@ -97,12 +97,13 @@
     }
   
     function isCellAliveInNextGeneration(x,y) {
-      var aliveNeighbors = countAliveNeighbors(x,y);
-    
-      if (isCellAlive(x,y)) {
-        return aliveNeighbors === 2 || aliveNeighbors === 3;
-      } else {
-        return aliveNeighbors === 3;
+      switch ( countAliveNeighbors(x,y) ) {
+      case 2:
+        return isCellAlive(x,y);
+      case 3:
+        return true;
+      default:
+        return false;
       }
     }
   
