@@ -133,7 +133,7 @@
     function replaceCharAtIndex(str, i, replacement) {
       var length = str.length;
       if (i >= length) return str;
-      return [str.slice(0,i), replacement, str.slice(i+1,str.length)].join('');
+      return [str.slice(0,i), replacement, str.slice(i+1,length)].join('');
     }
     
     function draw(x,y) {
