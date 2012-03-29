@@ -133,8 +133,8 @@
       
       var matrix = {
         width: w, height: h, lines: [],
-        init: function(char) {
-          var line = (new Array(this.width + 1)).join(char || ' ');
+        init: function() {
+          var line = (new Array(this.width + 1)).join(initChar || ' ');
           for (var i=0; i < this.height; i++) this.lines[i] = line;
         },
         getChar: function(x,y) {
@@ -151,7 +151,7 @@
         }
       }
       
-      matrix.init(initChar);
+      matrix.init();
       return matrix;
     }
         
@@ -166,7 +166,7 @@
       },
       addPattern: addPattern,
       clear: function() {
-        currentGeneration.init(emptyChar);
+        currentGeneration.init();
       }
     }
   }
