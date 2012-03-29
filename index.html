@@ -125,13 +125,8 @@
     // enables wraparound lookups on arrays and strings
     // fyi will not work with unicode strings!
     function atIndex(arr, i) {
-      return arr[wraparoundIndex(i, arr.length)];
-    }
-    
-    function wraparoundIndex(i, length) {
-      if (i >= length) return i - length;
-      else if (i < 0) return length + i;
-      else return i;
+      var length = arr.length;
+      return arr[(i + length) % length];
     }
     
     function replaceCharAtIndex(str, i, replacement) {
