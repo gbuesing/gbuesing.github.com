@@ -53,38 +53,37 @@
     ]
   };
   
-  function gameOfLife(width, height) {
-  
-    var currentGeneration = [];
+  function gameOfLife(width, height, aliveChar, emptyChar) {
+    aliveChar = aliveChar || '*'
+    emptyChar = emptyChar || ' '
+        
+    var currentGeneration = stringMatrix(width, height, emptyChar);
     
-    function setBlankGeneration() { // wee-ooo
-      var line = (new Array(width + 1)).join(' ');
-      for (var i=0; i < height; i++) currentGeneration[i] = line;
-    }
+    var patternCellRegexp = /\*/g;
     
-    var aliveCellRegexp = /\*/g;
-    
-    function addPattern(pattern, offset_x, offset_y) {      
-      if (!offset_x) offset_x = parseInt((width - pattern[0].length) / 2);
-      if (!offset_y) offset_y = parseInt((height - pattern.length) / 2);
+    function addPattern(pattern, offset_x, offset_y) {
+      var patternWidth = pattern[0].length, patternHeight = pattern.length;
+      
+      if (!offset_x) offset_x = Math.round((currentGeneration.width - patternWidth) / 2);
+      if (!offset_y) offset_y = Math.round((currentGeneration.height - patternHeight) / 2);
       
       for (var y=0; y < pattern.length; y++) {
         var match, line = pattern[y];
-        aliveCellRegexp.lastIndex = 0;
+        patternCellRegexp.lastIndex = 0;
         
-        while (match = aliveCellRegexp.exec(line)) {
-          draw(match.index + offset_x, y + offset_y);
+        while (match = patternCellRegexp.exec(line)) {
+          currentGeneration.setChar(match.index + offset_x, y + offset_y, aliveChar);
         }
       };
     }
   
     function calculateNextGeneration() {
       var nextGeneration = [];
-      for (var y=0; y < currentGeneration.length; y++) {
-        var line = currentGeneration[y];
+      for (var y=0; y < currentGeneration.height; y++) {
+        var line = currentGeneration.lines[y];
         var nextCells = [];
         for (var x=0; x < line.length; x++) {
-          var nextCell = isCellAliveInNextGeneration(x,y) ? '*' : ' ';
+          var nextCell = isCellAliveInNextGeneration(x,y) ? aliveChar : emptyChar;
           nextCells.push(nextCell);
         }
         nextGeneration[y] = nextCells.join('');
@@ -93,7 +92,7 @@
     }
   
     function isCellAlive(x,y) {
-      return getCell(x,y) === '*';
+      return currentGeneration.getChar(x,y) === aliveChar;
     }
   
     function isCellAliveInNextGeneration(x,y) {
@@ -117,51 +116,64 @@
       });
       return sum;
     }
-  
-    function getCell(x,y) {
-      var line = atIndex(currentGeneration, y);
-      return atIndex(line, x);
-    }
-  
-    // enables wraparound lookups on arrays and strings
-    // fyi will not work with unicode strings!
-    function atIndex(arr, i) {
-      var length = arr.length;
-      return arr[(i + length) % length];
-    }
     
-    function replaceCharAtIndex(str, i, replacement) {
-      var length = str.length;
-      if (i >= length) return str;
-      return [str.slice(0,i), replacement, str.slice(i+1,length)].join('');
-    }
-    
-    function draw(x,y) {
-      var line = currentGeneration[y];
-      if (line) {
-        currentGeneration[y] = replaceCharAtIndex(line, x, '*');
+    function stringMatrix(w, h, initChar) {
+      // wraparound lookup on arrays and strings
+      // will not work on unicode strings!
+      function atIndex(arr, i) {
+        var length = arr.length;
+        return arr[(i + length) % length];
       }
+      
+      function replaceCharAtIndex(str, i, replacement) {
+        var length = str.length;
+        if (i >= length) return str;
+        return [str.slice(0,i), replacement, str.slice(i+1,length)].join('');
+      }
+      
+      var matrix = {
+        width: w, height: h, lines: [],
+        init: function(char) {
+          var line = (new Array(this.width + 1)).join(char || ' ');
+          for (var i=0; i < this.height; i++) this.lines[i] = line;
+        },
+        getChar: function(x,y) {
+          var line = atIndex(this.lines, y);
+          return atIndex(line, x);
+        },
+        setChar: function(x,y,char) {
+          var line = this.lines[y];
+          if (!line) return;
+          this.lines[y] = replaceCharAtIndex(line, x, char);
+        },
+        toString: function() {
+          return this.lines.join("\n");
+        }
+      }
+      
+      matrix.init(initChar);
+      return matrix;
     }
-    
-    setBlankGeneration();
-    
+        
     return {
       generation: 0,
       next: function() {
-        currentGeneration = calculateNextGeneration();
+        currentGeneration.lines = calculateNextGeneration();
         this.generation ++;
       },
       toString: function() {
-        return currentGeneration.join("\n")
+        return currentGeneration.toString();
       },
       addPattern: addPattern,
-      clear: setBlankGeneration
+      clear: function() {
+        currentGeneration.init(emptyChar);
+      }
     }
   }
   
   var elem = document.getElementsByTagName("pre")[0];
   
-  var game = gameOfLife(90, 30);
+  var game = gameOfLife(90, 30, 'O', ' ');
   game.addPattern(patterns['gun']);
   
   var loop = setInterval(function() {
