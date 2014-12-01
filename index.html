@@ -10,6 +10,8 @@
       line-height: 1.428571429;
       color: #333;
       background-color: #fff;
+      margin: 0;
+      border: 0;
     }
     a {
       color: #428bca;
@@ -22,6 +24,7 @@
       width: 758px;
       height: 602px;
       border: 1px dotted #ccc;
+      cursor: pointer;
     }
     </style>
   </head>
@@ -203,5 +206,26 @@
     game.next();
     elem.textContent = game.toString();
   }, 100);
+
+  elem.addEventListener("touchstart", handleStart, false);
+  elem.addEventListener("click", handleClick, false);
+
+  function addPattern(pattern, offsetX, offsetY) {
+    var matrixX = Math.round((offsetX / 758) * 90);
+    var matrixY = Math.round((offsetY / 602) * 30);
+    game.addPattern(pattern, matrixX - 2, matrixY - 2);
+  }
+
+  function handleClick (e) {
+    e.preventDefault();
+    addPattern(patterns['blinker'], e.offsetX, e.offsetY);
+  }
+
+  function handleStart(e) {
+    e.preventDefault();
+    addPattern(patterns['blinker'], e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+  }
+
+  
   </script>
 </html>
