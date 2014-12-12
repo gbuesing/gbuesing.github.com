@@ -21,8 +21,8 @@
       text-align: center;
     }
     pre {
-      width: 758px;
-      height: 602px;
+      width: 560px;
+      height: 400px;
       border: 1px dotted #ccc;
       cursor: pointer;
     }
@@ -37,7 +37,6 @@
     </p>
     <center>
       <pre></pre>
-      <br>
       <h3>Projects</h3>
       <p><a href="http://mnist-ruby-test.herokuapp.com/">Handwritten Digit Classifier</a></p>
       <p><a href="https://github.com/gbuesing/neural-net-ruby">Neural Network in Ruby</a></p>
@@ -217,7 +216,7 @@
   
   var elem = document.getElementsByTagName("pre")[0];
   
-  var game = gameOfLife(90, 30, 'O', ' ');
+  var game = gameOfLife(40, 20, 'O', ' ');
   game.addPattern(patterns['gun']);
   
   var loop = setInterval(function() {
@@ -230,8 +229,8 @@
   elem.addEventListener("click", handleClick, false);
 
   function addPattern(pattern, offsetX, offsetY) {
-    var matrixX = Math.round((offsetX / 758) * 90);
-    var matrixY = Math.round((offsetY / 602) * 30);
+    var matrixX = Math.round((offsetX / 560) * 20);
+    var matrixY = Math.round((offsetY / 400) * 20);
     game.addPattern(pattern, matrixX - 2, matrixY - 2);
   }
 
@@ -247,8 +246,8 @@
 
   function handleTouchmove(e) {
     e.preventDefault();
-    var matrixX = Math.round((e.changedTouches[0].pageX / 758) * 90);
-    var matrixY = Math.round((e.changedTouches[0].pageY / 602) * 30);
+    var matrixX = Math.round((e.changedTouches[0].pageX / 560) * 30);
+    var matrixY = Math.round((e.changedTouches[0].pageY / 400) * 20);
     game.addPattern(['*'], matrixX, matrixY);
   };
 
