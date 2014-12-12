@@ -229,7 +229,7 @@
   elem.addEventListener("click", handleClick, false);
 
   function addPattern(pattern, offsetX, offsetY) {
-    var matrixX = Math.round((offsetX / 560) * 20);
+    var matrixX = Math.round((offsetX / 560) * 40);
     var matrixY = Math.round((offsetY / 400) * 20);
     game.addPattern(pattern, matrixX - 2, matrixY - 2);
   }
@@ -246,7 +246,7 @@
 
   function handleTouchmove(e) {
     e.preventDefault();
-    var matrixX = Math.round((e.changedTouches[0].pageX / 560) * 30);
+    var matrixX = Math.round((e.changedTouches[0].pageX / 560) * 40);
     var matrixY = Math.round((e.changedTouches[0].pageY / 400) * 20);
     game.addPattern(['*'], matrixX, matrixY);
   };
